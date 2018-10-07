@@ -1,0 +1,22 @@
+
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+
+# you could get the name (or components) and explode it in the controller
+
+POST    /usr/:app/login           controllers.UserController.login(app: String)
+POST    /usr/:app/signup          controllers.UserController.signup(app: String)
+
+GET     /lib/:app/:node           controllers.NodeController.read(app: String, node: String)
+PUT     /lib/:app/:node           controllers.NodeController.update(app: String, node: String)
+
+GET     /dom/:app/*path           controllers.DomController.read(app: String, path: String)
+PUT     /dom/:app/*path           controllers.DomController.update(app: String, path: String)
+
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
+#GET   /clients/:id          controllers.Clients.show(id: Long)
