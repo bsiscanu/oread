@@ -12,7 +12,7 @@ class NodeController @Inject() (cc: ControllerComponents, ns: NodeService, as: A
 
 
   def read(app: String, node: String) = Action.async {
-    ns.getNode(app, node).map(result => Ok{ result })
+    ns.get(app, node).map(result => Ok{ result })
   }
 
   def update(app: String, node: String) = Action.async { request: Request[AnyContent] =>
@@ -20,7 +20,7 @@ class NodeController @Inject() (cc: ControllerComponents, ns: NodeService, as: A
 
     val result = if (jws.isDefined && as.check(jws.get, app)) {
       val content = request.body.asText.get
-      ns.setNode(app, node, content)
+      ns.set(app, node, content)
     } else {
       Future.failed(new Exception())
     }
@@ -29,18 +29,17 @@ class NodeController @Inject() (cc: ControllerComponents, ns: NodeService, as: A
       .recover{ case thrown => Unauthorized{ "Not Authorized" }}
   }
 
+  def remove(app: String, name: String) = Action.async { request: Request[AnyContent] =>
+    val jws = request.headers.get("X-domy-token")
 
-//  def delete(app: String, name: String) = Action.async { request: Request[AnyContent] =>
-//    val jws = request.headers.get("X-domy-token")
-//
-//    val result = if (jws.isDefined && as.check(jws.get, app)) {
-//      ns.del(app, name)
-//    } else {
-//      Future.failed(new Exception())
-//    }
-//
-//    result.map{ data => Ok{ data } }
-//      .recover{ case thrown => Unauthorized{ "Not Authorized" }}
-//  }
+    val result = if (jws.isDefined && as.check(jws.get, app)) {
+      ns.del(app, name)
+    } else {
+      Future.failed(new Exception())
+    }
+
+    result.map{ data => Ok{ data } }
+      .recover{ case thrown => Unauthorized{ "Not Authorized" }}
+  }
 
 }

@@ -8,7 +8,7 @@ import io.jsonwebtoken.SignatureAlgorithm
 @Singleton
 class AuthService {
 
-  val secret: String = "how_deep_is_your_love!"
+  val secret: String = "SECRET!"
 
   def sign(app: String): String = {
     Jwts.builder

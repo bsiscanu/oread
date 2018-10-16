@@ -15,8 +15,20 @@ class DomController @Inject()(cc: ControllerComponents, ds: DomService, ns: Node
 //    ETAG -> "xx")
 
   def read(app: String, path: String) = Action.async {
+    this.collect(app, path)
+      .map(response => Ok{ response })
+  }
+
+  private def collect(app: String, path: String): Future[String] = {
     ds.get(app, path)
-      .map(data => data.distinct.map(el => ns.getNode(app, el)))
+      .map(data => data.distinct.map(el => {
+        if (el.contains("~/")) {
+          val data = el.split("/")
+          collect(app, data(1))
+        } else {
+          ns.get(app, el)
+        }
+      }))
       .flatMap(data => Future.sequence(data))
       .map{ data =>
         try {
@@ -25,22 +37,46 @@ class DomController @Inject()(cc: ControllerComponents, ds: DomService, ns: Node
           case e: Exception => ""
         }
       }
-      .map(response => Ok{ response })
   }
 
   def update(app: String, path: String) = Action.async { request: Request[AnyContent] =>
     val jws = request.headers.get("X-domy-token")
 
     val result = if (jws.isDefined && as.check(jws.get, app)) {
-      ds.set(app, path)
+      val arr = ds.divide(path)
+      val data = request.body.asText.get
+
+      // todo: Path should contain the name of the struct (last word in the string)
+      ds.has(app, data).flatMap(result => {
+        var content = ""
+        if (result) {
+          content = "~/" + data
+        } else {
+          content = data
+        }
+
+        ds.set(app, path, content)
+      })
+
     } else {
       Future.failed(new Exception())
     }
 
-    result.map{ data => Ok{ data } }
-      .recover{ case thrown => Unauthorized{ "Not Authorized" }}  }
+    result.map{ data => Ok{ data.toString } }
+      .recover{ case thrown => Unauthorized{ "Not Authorized" }}
+  }
 
-  // delete the entire directory recursively
-  //  def delete(app: String, path: String) = Action.async {}
+  def remove(app: String, path: String) = Action.async { request: Request[AnyContent] =>
+    val jws = request.headers.get("X-domy-token")
+
+    val result = if (jws.isDefined && as.check(jws.get, app)) {
+      ds.del(app, path)
+    } else {
+      Future.failed(new Exception())
+    }
+
+    result.map{ data => Ok{ data.toString } }
+      .recover{ case thrown => Unauthorized{ "Not Authorized" }}
+  }
 
 }

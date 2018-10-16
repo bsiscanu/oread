@@ -1,9 +1,6 @@
 package services
 
 import javax.inject.{Inject, Singleton}
-import play.api.libs.json._
-import models.NodeModel
-
 import scala.concurrent.{ExecutionContext, Future}
 
 
@@ -15,16 +12,18 @@ class DomService @Inject()(st: StoreService)(implicit ec: ExecutionContext) {
     st.getDom("dom", st.encode(app), prepare(divide(path)))
   }
 
-  def set(app: String, path: String): Future[String] = {
-    val arr = divide(path)
-    val name = arr(arr.length - 1)
+  def set(app: String, path: String, content: String): Future[Boolean] = {
+    st.setDom("dom", st.encode(app), prepare(divide(path)), content)
+  }
 
-    st.addDom("dom", st.encode(app), prepare(arr) + "/opt", name)
+  def has(app: String, path: String): Future[Boolean] = {
+    st.hasDom("dom", st.encode(app), prepare(divide(path)))
+  }
+
+  def del(app: String, path: String): Future[Boolean] = {
+    st.delDom("dom", st.encode(app), prepare(divide(path)))
   }
 
   def divide(path: String): Array[String] = path.split("/")
   def prepare(arr: Array[String]): String = arr.map(st.encode(_)).reduce(_ + "/" + _)
-
-//  def remove(app: String, path: String): Future[WSResponse] = {}
-
 }

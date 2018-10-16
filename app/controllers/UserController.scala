@@ -12,19 +12,18 @@ class UserController @Inject()(cc: ControllerComponents, us: UserService, as: Au
 
   def login(app: String) = Action.async { request: Request[AnyContent] =>
     val key = request.body.asText.get
+
     us.get(app)
       .map{ token =>
         if (token.length > 0 && token == key) {
           as.sign(app)
         } else {
-          ""
+          "The provided key does not match"
         }
       }
-      // you have to use exceptions and recover
-      .map(result => Ok{ result })
+      .map{ result => Ok{ result }}
   }
 
-  // signup form on the website
   def signup(app: String) = Action.async { request: Request[AnyContent] =>
     val key = request.body.asText.get
     us.get(app)
@@ -32,10 +31,11 @@ class UserController @Inject()(cc: ControllerComponents, us: UserService, as: Au
         if (token.isEmpty) {
           us.set(app, key)
         } else {
-          Future.successful("Storage name is already in use")
+          Future.failed(new Exception())
         }
       }
-      .map(result => Ok { result })
+      .map(result => Ok { result.toString })
+      .recover{ case thrown => Unauthorized{ "Storage name is already in use" } }
   }
 
 }

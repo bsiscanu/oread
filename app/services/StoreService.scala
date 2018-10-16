@@ -5,7 +5,6 @@ import com.coreos.jetcd.data.ByteSequence
 import com.google.common.io.BaseEncoding
 import javax.inject.{ Inject, Singleton }
 import play.api.libs.ws._
-
 import scala.concurrent.{ ExecutionContext, Future }
 
 
@@ -15,6 +14,7 @@ class StoreService @Inject()(ws: WSClient)(implicit ec: ExecutionContext)  {
   val url: String = "http://localhost:2379/v2/keys/"
   val client = Client.builder.endpoints("http://localhost:2379").build
   val kvClient = client.getKVClient
+
 
   def getDom(kind: String, dir: String, name: String): Future[Seq[String]] = {
     ws.url(url + kind + "/" + dir + "/" + name + "?recursive=true").get
@@ -27,24 +27,28 @@ class StoreService @Inject()(ws: WSClient)(implicit ec: ExecutionContext)  {
       }
   }
 
-  def addDom(kind: String, dir: String, name: String, content: Any): Future[String] = {
-    ws.url(url + kind + "/" + dir + "/" + name)
+  def setDom(kind: String, dir: String, name: String, content: Any): Future[Boolean] = {
+    ws.url(url + kind + "/" + dir + "/" + name + "/opt")
       .addHttpHeaders("Content-Type" -> "application/x-www-form-urlencoded")
       .put("value=" + content)
       .map(result => (result.json \ "node" \ "modifiedIndex").get.toString)
+      .map(result => if (result.toInt > 0) true else false)
   }
 
-  def set(kind: String, app: String, name: String, content: String) = {
-    val key = ByteSequence.fromString(kind + app + name)
-    val value = ByteSequence.fromString(content)
-
-    Future(
-      kvClient.put(key, value).get.getPrevKv.getValue.toStringUtf8
-    )
+  def hasDom(kind: String, dir: String, name: String): Future[Boolean] = {
+    ws.url(url + kind + "/" + dir + "/" + name).head
+      .map(result => if (result.status == 200) true else false)
   }
 
-  def get(kind: String, app: String, name: String) = {
-    val key = ByteSequence.fromString(kind + app + name)
+  def delDom(kind: String, dir: String, name: String): Future[Boolean] = {
+    ws.url(url + kind + "/" + dir + "/" + name + "?recursive=true&dir=true").delete
+      .map(result => (result.json \ "node" \ "modifiedIndex").get.toString)
+      .map(result => if (result.toInt > 0) true else false)
+  }
+
+
+  def getNode(kind: String, app: String, name: String): Future[String] = {
+    val key = ByteSequence.fromString(kind + "/" + app + "/" + name)
 
     Future{
       val list = kvClient.get(key).get.getKvs
@@ -58,24 +62,24 @@ class StoreService @Inject()(ws: WSClient)(implicit ec: ExecutionContext)  {
     }
   }
 
+  def setNode(kind: String, app: String, name: String, content: String): Future[String] = {
+    val key = ByteSequence.fromString(kind + "/" + app + "/" + name)
+    val value = ByteSequence.fromString(content)
 
-//  def get(kind: String, dir: String, name: String): Future[String] = {
-//    ws.url(url + kind + "/" + dir + "/" + name).get
-//      .map{ result =>
-//        try {
-//          (result.json \ "node" \ "value").get.as[String]
-//        } catch {
-//          case e: Exception => ""
-//        }
-//      }
-//  }
+    Future(
+      kvClient.put(key, value).get.getPrevKv.getValue.toStringUtf8
+    )
+  }
 
-  // recursive delete, and delNode using jetcd
-//  def delete(kind: String, dir: String, name: String): Future[String] = {
-//    ws.url(url + kind + "/" + dir + "/" + name).delete
-//      .map(result => (result.json \ "node" \ "modifiedIndex").get.toString)
-//  }
+  def delNode(kind: String, app: String, name: String): Future[String] = {
+    val key = ByteSequence.fromString(kind + app + name)
+
+    Future (
+      kvClient.delete(key).get.getPrevKvs.get(0).getValue.toString()
+    )
+  }
 
   def encode(data: String): String = BaseEncoding.base64.encode(data.getBytes)
   def decode(data: String): String = BaseEncoding.base64.decode(data).toString
+
 }
