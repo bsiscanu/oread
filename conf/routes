@@ -6,17 +6,9 @@
 
 # you could get the name (or components) and explode it in the controller
 
-POST    /usr/:app/login           controllers.UserController.login(app: String)
-POST    /usr/:app/signup          controllers.UserController.signup(app: String)
+POST    /usr/login           controllers.UserController.login()
+POST    /usr/signup          controllers.UserController.signup()
 
-GET     /lib/:app/:node           controllers.NodeController.read(app: String, node: String)
-PUT     /lib/:app/:node           controllers.NodeController.update(app: String, node: String)
-DELETE  /lib/:app/:node           controllers.NodeController.remove(app: String, node: String)
-
-GET     /dom/:app/*path           controllers.DomController.read(app: String, path: String)
-PUT     /dom/:app/*path           controllers.DomController.update(app: String, path: String)
-DELETE  /dom/:app/*path           controllers.DomController.remove(app: String, path: String)
-
-
-# Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET     /dom/:app/:node           controllers.DomController.read(app: String, node: String)
+PUT     /dom/:app/:node           controllers.DomController.update(app: String, node: String)
+DELETE  /dom/:app/:node           controllers.DomController.remove(app: String, node: String)

@@ -10,32 +10,48 @@ import scala.concurrent.{ ExecutionContext, Future }
 class UserController @Inject()(cc: ControllerComponents, us: UserService, as: AuthService)
                               (implicit ec: ExecutionContext) extends AbstractController(cc) {
 
-  def login(app: String) = Action.async { request: Request[AnyContent] =>
-    val key = request.body.asText.get
 
-    us.get(app)
-      .map{ token =>
-        if (token.length > 0 && token == key) {
-          as.sign(app)
+  def login() = Action.async { request: Request[AnyContent] =>
+
+    val bulk = request.body.asJson.get
+
+    val user = (bulk \ "user").get.toString;
+    val pass = (bulk \ "pass").get.toString;
+
+    us.check(user)
+      .map{ result =>
+        if (result.length > 0 && result == pass) {
+          as.sign(user);
         } else {
-          "The provided key does not match"
+          throw new Exception("The provided password doesn't match");
         }
       }
       .map{ result => Ok{ result }}
+      .recover{ case thrown => Unauthorized{ thrown.getMessage } };
   }
 
-  def signup(app: String) = Action.async { request: Request[AnyContent] =>
-    val key = request.body.asText.get
-    us.get(app)
-      .flatMap{ token =>
-        if (token.isEmpty) {
-          us.set(app, key)
+  def signup() = Action.async { request: Request[AnyContent] =>
+
+    val bulk = request.body.asJson.get
+
+    val user = (bulk \ "user").get.toString;
+    val pass = (bulk \ "pass").get.toString;
+    val mail = (bulk \ "mail").get.toString;
+
+    us.check(user)
+      .flatMap{ result =>
+        if (result.isEmpty) {
+          us.create(user, pass, mail)
+            .map(result => as.sign(user))
         } else {
-          Future.failed(new Exception())
+          Future.failed(
+            new Exception("Username is already in use")
+          );
         }
       }
-      .map(result => Ok { result.toString })
-      .recover{ case thrown => Unauthorized{ "Storage name is already in use" } }
+//      .map(data =>  as.sign(user))
+      .map{ response => Ok { response }}
+      .recover{ case thrown => Unauthorized{ thrown.getMessage } }
   }
 
 }

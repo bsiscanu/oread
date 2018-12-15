@@ -5,25 +5,50 @@ import scala.concurrent.{ExecutionContext, Future}
 
 
 @Singleton
-class DomService @Inject()(st: StoreService)(implicit ec: ExecutionContext) {
+class DomService @Inject()(js: JetcdService, ns: NetcdService)(implicit ec: ExecutionContext) {
 
-
-  def get(app: String, path: String): Future[Seq[String]] = {
-    st.getDom("dom", st.encode(app), prepare(divide(path)))
+  def get(dir: String, node: String) = {
+    js.get("lib", dir, node);
   }
 
-  def set(app: String, path: String, content: String): Future[Boolean] = {
-    st.setDom("dom", st.encode(app), prepare(divide(path)), content)
+  def set(dir: String, node: String, content: String): Future[Boolean] = {
+    js.set("lib", dir, node, content);
   }
 
-  def has(app: String, path: String): Future[Boolean] = {
-    st.hasDom("dom", st.encode(app), prepare(divide(path)))
+  def has(dir: String, node: String): Future[Boolean] = {
+    ns.has("dom", dir, node);
   }
 
-  def del(app: String, path: String): Future[Boolean] = {
-    st.delDom("dom", st.encode(app), prepare(divide(path)))
+  def del(dir: String, node: String): Future[Boolean] = {
+    js.del("dom", dir, node);
   }
-
-  def divide(path: String): Array[String] = path.split("/")
-  def prepare(arr: Array[String]): String = arr.map(st.encode(_)).reduce(_ + "/" + _)
 }
+
+
+
+// Example of data extraction from the DOM tree
+//    this.get(app, node)
+//      .map(data =>
+//        data.distinct
+//          .filter(name => name != node)
+//          .map(name => {
+//            if (el.contains("~/")) {
+//              collect(app, name)
+//            } else {
+//              ns.get(app, name)
+//            }
+//          })
+//      )
+//      .flatMap(data => Future.sequence(data))
+//      .map { data =>
+//        try {
+//          data.reduceLeft(_ + " \n" + _)
+//        } catch {
+//          case e: Exception => ""
+//        }
+//      }
+//      .flatMap(data => ns.get(app, last)
+//        .map(el => data + " \n return " + el)
+//      );
+//  }
+

@@ -1,5 +1,6 @@
 package services
 
+import java.util.Date
 import javax.inject.Singleton
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -10,16 +11,17 @@ class AuthService {
 
   val secret: String = "SECRET!"
 
-  def sign(app: String): String = {
+  def sign(user: String): String = {
     Jwts.builder
-      .setSubject(app)
+      .setSubject(user)
       .setIssuer("@domy.io")
+      .setIssuedAt(new Date())
       .signWith(SignatureAlgorithm.HS256, secret)
       .compact()
   }
 
-  def check(jws: String, app: String): Boolean = {
-    Jwts.parser.setSigningKey(secret).parseClaimsJws(jws).getBody.getSubject == app
+  def check(jws: String, user: String): Boolean = {
+    Jwts.parser.setSigningKey(secret).parseClaimsJws(jws).getBody.getSubject == user
   }
 
 }

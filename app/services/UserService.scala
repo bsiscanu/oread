@@ -5,15 +5,26 @@ import scala.concurrent.{ExecutionContext, Future}
 
 
 @Singleton
-class UserService @Inject()(st: StoreService)(implicit ec: ExecutionContext) {
+class UserService @Inject()(js: JetcdService, ns: NetcdService)(implicit ec: ExecutionContext) {
 
-  def get(app: String): Future[String] = {
-    st.getNode("usr", st.encode(app), "owner")
+  def check(user: String): Future[String] = {
+    js.get("usr", user, "pass")
   }
 
-  def set(app: String, key: String): Future[String] = {
-    st.setNode("usr", st.encode(app), "owner", key)
+  def create(user: String, pass: String, mail: String): Future[Seq[Boolean]] = {
+
+    Future.sequence(Seq(
+      js.set("usr", user, "pass", pass),
+      js.set("usr", user, "email", mail),
+      ns.set("usr", "list", user, user)
+    ));
   }
 
-  def del(app: String, key: String): Unit = {}
+  def del(user: String): Future[Seq[Boolean]] = {
+    Future.sequence(Seq(
+      js.del("usr", user, "pass"),
+      js.del("usr", user, "email"),
+      ns.del("usr", "list", user)
+    ));
+  }
 }
