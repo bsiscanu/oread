@@ -11,17 +11,26 @@ class DomService @Inject()(js: JetcdService, ns: NetcdService)(implicit ec: Exec
     js.get("lib", dir, node);
   }
 
-  def set(dir: String, node: String, content: String): Future[Boolean] = {
+  def set(dir: String, node: String, content: String): Future[String] = {
     js.set("lib", dir, node, content);
   }
 
-  def has(dir: String, node: String): Future[Boolean] = {
+  def del(dir: String, node: String) = {
+    js.del("lib", dir, node);
+  }
+
+  def has(dir: String, node: String): Future[String] = {
     ns.has("dom", dir, node);
   }
 
-  def del(dir: String, node: String): Future[Boolean] = {
-    js.del("dom", dir, node);
+  def modularize(origin: Option[String], content: String) : String = {
+    if (origin.isDefined && origin.get == "web") {
+      content.replace("module.exports=", "return ")
+    } else {
+      content
+    }
   }
+
 }
 
 

@@ -11,9 +11,12 @@ class DomController @Inject()(cc: ControllerComponents, ds: DomService, as: Auth
                              (implicit ec: ExecutionContext) extends AbstractController(cc) {
 
 
-  def read(dir: String, node: String) = Action.async {
+  def read(dir: String, node: String) = Action.async { request: Request[AnyContent] =>
+
+    val origin = request.headers.get("X-Domy-Origin");
+
     this.ds.get(dir, node).map{ data =>
-      Ok{ data }.withHeaders(CACHE_CONTROL -> "max-age=3600")
+      Ok{ this.ds.modularize(origin, data) }.withHeaders(CACHE_CONTROL -> "max-age=3600")
     };
   }
 
@@ -30,7 +33,7 @@ class DomController @Inject()(cc: ControllerComponents, ds: DomService, as: Auth
       );
     }
 
-    result.map{ data => Ok{ result.toString }}
+    result.map{ data => Ok{ "Success" }}
       .recover{ case thrown => Unauthorized{ thrown.getMessage }}
   }
 
@@ -46,7 +49,7 @@ class DomController @Inject()(cc: ControllerComponents, ds: DomService, as: Auth
       );
     }
 
-    result.map{ data => Ok{ result.toString }}
+    result.map{ data => Ok{ "Success" }}
       .recover{ case thrown => Unauthorized{ thrown.getMessage }}
   }
 }

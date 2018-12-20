@@ -22,23 +22,23 @@ class NetcdService @Inject()(ws: WSClient)(implicit ec: ExecutionContext){
       };
   }
 
-  def set(base: String, medium: String, top: String, layer: String): Future[Boolean] = {
+  def set(base: String, medium: String, top: String, layer: String): Future[String] = {
     ws.url(pw + encode(base, medium, top) + "/opt")
       .addHttpHeaders("Content-Type" -> "application/x-www-form-urlencoded")
       .put("value=" + layer)
       .map(result => (result.json \ "node" \ "modifiedIndex").get.toString)
-      .map(result => if (result.toInt > 0) true else false);
+      .map(result => if (result.toInt > 0) "true" else "false");
   }
 
-  def has(base: String, medium: String, top: String): Future[Boolean] = {
+  def has(base: String, medium: String, top: String): Future[String] = {
     ws.url(pw + encode(base, medium, top)).head
-      .map(result => if (result.status == 200) true else false);
+      .map(result => if (result.status == 200) "true" else "false");
   }
 
-  def del(base: String, medium: String, top: String): Future[Boolean] = {
+  def del(base: String, medium: String, top: String): Future[String] = {
     ws.url(pw + encode(base, medium, top) + "?recursive=true&dir=true").delete
       .map(result => (result.json \ "node" \ "modifiedIndex").get.toString)
-      .map(result => if (result.toInt > 0) true else false);
+      .map(result => if (result.toInt > 0) "true" else "false");
   }
 
   def encode(base: String, medium: String, top: String): String =

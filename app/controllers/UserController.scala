@@ -15,8 +15,8 @@ class UserController @Inject()(cc: ControllerComponents, us: UserService, as: Au
 
     val bulk = request.body.asJson.get
 
-    val user = (bulk \ "user").get.toString;
-    val pass = (bulk \ "pass").get.toString;
+    val user = (bulk \ "user").get.as[String].toString;
+    val pass = (bulk \ "pass").get.as[String].toString;
 
     us.check(user)
       .map{ result =>
@@ -34,9 +34,9 @@ class UserController @Inject()(cc: ControllerComponents, us: UserService, as: Au
 
     val bulk = request.body.asJson.get
 
-    val user = (bulk \ "user").get.toString;
-    val pass = (bulk \ "pass").get.toString;
-    val mail = (bulk \ "mail").get.toString;
+    val user = (bulk \ "user").get.as[String].toString;
+    val pass = (bulk \ "pass").get.as[String].toString;
+    val mail = (bulk \ "mail").get.as[String].toString;
 
     us.check(user)
       .flatMap{ result =>

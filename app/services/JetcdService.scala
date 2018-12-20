@@ -18,17 +18,17 @@ class JetcdService @Inject()(implicit ec: ExecutionContext)  {
     };
   }
 
-  def set(base: String, medium: String, top: String, content: String): Future[Boolean] = {
+  def set(base: String, medium: String, top: String, content: String): Future[String] = {
     val value = ByteSequence.fromString(content);
     Future(
       kv.put(path(base, medium, top), value).get.getPrevKv.getValue.toStringUtf8
-    ).map(result => if(result.isEmpty) false else true)
+    );
   }
 
-  def del(base: String, medium: String, top: String): Future[Boolean] = {
+  def del(base: String, medium: String, top: String): Future[String] = {
     Future (
       kv.delete(path(base, medium, top)).get.getPrevKvs.get(0).getValue.toStringUtf8
-    ).map(result => if(result.isEmpty) false else true)
+    );
   }
 
   def path(base: String, medium: String, top: String): ByteSequence =

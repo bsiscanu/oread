@@ -11,7 +11,7 @@ class UserService @Inject()(js: JetcdService, ns: NetcdService)(implicit ec: Exe
     js.get("usr", user, "pass")
   }
 
-  def create(user: String, pass: String, mail: String): Future[Seq[Boolean]] = {
+  def create(user: String, pass: String, mail: String): Future[Seq[String]] = {
 
     Future.sequence(Seq(
       js.set("usr", user, "pass", pass),
@@ -20,7 +20,7 @@ class UserService @Inject()(js: JetcdService, ns: NetcdService)(implicit ec: Exe
     ));
   }
 
-  def del(user: String): Future[Seq[Boolean]] = {
+  def del(user: String)= {
     Future.sequence(Seq(
       js.del("usr", user, "pass"),
       js.del("usr", user, "email"),
