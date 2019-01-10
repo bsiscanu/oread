@@ -6,9 +6,12 @@
 
 # you could get the name (or components) and explode it in the controller
 
-POST    /usr/login           controllers.UserController.login()
-POST    /usr/signup          controllers.UserController.signup()
+POST    /usr/login                                         controllers.UserController.login()
+POST    /usr/signup                                        controllers.UserController.signup()
 
-GET     /dom/:app/:node           controllers.DomController.read(app: String, node: String)
-PUT     /dom/:app/:node           controllers.DomController.update(app: String, node: String)
-DELETE  /dom/:app/:node           controllers.DomController.remove(app: String, node: String)
+GET     /etc/health                                        controllers.MetaController.health()
+GET     /etc/:catalog/:component/:version                  controllers.MetaController.source(catalog: String, component: String, version: String)
+
+GET     /lib/:catalog/:component/:version/*path            controllers.HeapController.read(catalog: String, component: String, version: String, path: String)
+PUT     /lib/:catalog/:component/:version/*path            controllers.HeapController.update(catalog: String, component: String, version: String, path: String)
+DELETE  /lib/:catalog/:component/:version/*path            controllers.HeapController.remove(catalog: String, component: String, version: String, path: String)

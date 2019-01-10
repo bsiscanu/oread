@@ -1,34 +1,24 @@
 package services
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 
 @Singleton
-class DomService @Inject()(js: JetcdService, ns: NetcdService)(implicit ec: ExecutionContext) {
+class NodeService @Inject()(fs: FileService) {
 
-  def get(dir: String, node: String) = {
-    js.get("lib", dir, node);
+  def get(options: Seq[String]) = {
+    fs.get(options);
   }
 
-  def set(dir: String, node: String, content: String): Future[String] = {
-    js.set("lib", dir, node, content);
+
+  def set(options: Seq[String], content: Array[Byte]): String = {
+    fs.set(options, content);
   }
 
-  def del(dir: String, node: String) = {
-    js.del("lib", dir, node);
-  }
 
-  def has(dir: String, node: String): Future[String] = {
-    ns.has("dom", dir, node);
-  }
-
-  def modularize(origin: Option[String], content: String) : String = {
-    if (origin.isDefined && origin.get == "web") {
-      content.replace("module.exports=", "return ")
-    } else {
-      content
-    }
+  def del(options: Seq[String]) = {
+    fs.del(options);
   }
 
 }
@@ -61,3 +51,8 @@ class DomService @Inject()(js: JetcdService, ns: NetcdService)(implicit ec: Exec
 //      );
 //  }
 
+//Example of content replace
+//
+//def modularize(content: String) : String = {
+//  content.replace("module.exports=", "return ")
+//}
