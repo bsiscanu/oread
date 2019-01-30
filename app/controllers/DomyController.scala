@@ -1,13 +1,14 @@
 package controllers
 
 import javax.inject.{ Inject, Singleton }
-import services.{ AuthService, NodeService }
+import services.{ AuthService, MetaService, NodeService }
 import play.api.mvc._
+
 import scala.concurrent._
 
 
 @Singleton
-class HeapController @Inject()(cc: ControllerComponents, ns: NodeService, as: AuthService)
+class DomyController @Inject()(cc: ControllerComponents, ns: NodeService, as: AuthService, mt: MetaService)
                               (implicit ec: ExecutionContext) extends AbstractController(cc) {
 
 
@@ -26,6 +27,25 @@ class HeapController @Inject()(cc: ControllerComponents, ns: NodeService, as: Au
 
     // username is default catalog
     if (jws.isDefined && as.check(jws.get, catalog)) {
+
+      if (path.contains("web-components.json")) {
+
+        val content = "// App: CommonJS Main".getBytes
+        val address = path.replace(
+          "web-components.json",
+          "index.js"
+        );
+
+        this.ns.set(Seq(catalog, component, version, address), content)
+
+        val description = this.mt.describe(
+          component,
+          version,
+          "webcomponent"
+        ).getBytes;
+
+        this.ns.set(Seq(catalog, component, "package.json"), description)
+      }
 
       val content = request.body.asRaw.get.asBytes().get.toArray;
       this.ns.set(Seq(catalog, component, version, path), content);

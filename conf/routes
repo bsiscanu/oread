@@ -12,6 +12,6 @@ POST    /usr/signup                                        controllers.UserContr
 GET     /etc/health                                        controllers.MetaController.health()
 GET     /etc/:catalog/:component/:version                  controllers.MetaController.source(catalog: String, component: String, version: String)
 
-GET     /lib/:catalog/:component/:version/*path            controllers.HeapController.read(catalog: String, component: String, version: String, path: String)
-PUT     /lib/:catalog/:component/:version/*path            controllers.HeapController.update(catalog: String, component: String, version: String, path: String)
-DELETE  /lib/:catalog/:component/:version/*path            controllers.HeapController.remove(catalog: String, component: String, version: String, path: String)
+GET     /lib/:catalog/:component/:version/*path            controllers.DomyController.read(catalog: String, component: String, version: String, path: String)
+PUT     /lib/:catalog/:component/:version/*path            controllers.DomyController.update(catalog: String, component: String, version: String, path: String)
+DELETE  /lib/:catalog/:component/:version/*path            controllers.DomyController.remove(catalog: String, component: String, version: String, path: String)

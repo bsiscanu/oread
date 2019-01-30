@@ -4,7 +4,6 @@ import javax.inject.{ Inject, Singleton }
 import play.api.libs.json.Json
 import play.api.mvc._
 import services.{ AuthService, MetaService }
-
 import scala.concurrent.ExecutionContext
 
 

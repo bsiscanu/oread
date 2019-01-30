@@ -19,7 +19,7 @@ class FileService @Inject()(implicit ec: ExecutionContext) {
   def set(pathway: Seq[String], content: Array[Byte]) = {
 
     val blobInfo: BlobInfo = BlobInfo.newBuilder(trail(pathway))
-      .setContentType("text/plain")
+//      .setContentType("text/plain")
       .setCacheControl("public, max-age=3600")
       .build;
 
@@ -59,6 +59,7 @@ class FileService @Inject()(implicit ec: ExecutionContext) {
 
 
   def trail(pathway: Seq[String]) = {
-    BlobId.of(bucket, pathway.reduce(_ + "/" + _));
+    val address = "pkg" +: pathway
+    BlobId.of(bucket, address.reduce(_ + "/" + _));
   }
 }
