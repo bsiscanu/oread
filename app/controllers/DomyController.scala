@@ -44,7 +44,7 @@ class DomyController @Inject()(cc: ControllerComponents, ns: NodeService, as: Au
           "webcomponent"
         ).getBytes;
 
-        this.ns.set(Seq(catalog, component, "package.json"), description)
+        this.ns.set(Seq(catalog, component, version, "package.json"), description)
       }
 
       val content = request.body.asRaw.get.asBytes().get.toArray;
@@ -58,14 +58,15 @@ class DomyController @Inject()(cc: ControllerComponents, ns: NodeService, as: Au
   }
 
 
-  def remove(catalog: String, component: String, version: String, path: String) = Action { request: Request[AnyContent] =>
+  def remove(path: String) = Action { request: Request[AnyContent] =>
 
     val jws = request.headers.get("X-Domy-Token");
 
+    val segments = path.split("/");
     // username is default catalog
-    if (jws.isDefined && as.check(jws.get, catalog)) {
+    if (jws.isDefined && as.check(jws.get, segments(1))) {
 
-      this.ns.del(Seq(catalog, component, version, path));
+      this.ns.del(path);
 
       Ok("done");
     } else {

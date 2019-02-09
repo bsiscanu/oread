@@ -17,10 +17,10 @@ class MetaService @Inject()(fs: FileService) {
         "version" -> JsString(version),
         "description" -> JsString(description),
         "private" -> JsFalse,
-        "main" -> JsString("latest/dist/index.js"),
-        "types" -> JsString("latest/dist/types/index.d.ts"),
-        "collection" -> JsString("latest/dist/collection/collection-manifest.json"),
-        "files" -> JsArray(IndexedSeq(JsString("latest/dist")))
+        "main" -> JsString("dist/index.js"),
+        "types" -> JsString("dist/types/index.d.ts"),
+        "collection" -> JsString("dist/collection/collection-manifest.json"),
+        "files" -> JsArray(IndexedSeq(JsString("dist/")))
       ))
     );
   }

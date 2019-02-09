@@ -7,6 +7,10 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class UserService @Inject()(es: EtcdService) {
 
+  def sub(email: String) = {
+    es.set(Seq("news", email), email)
+  }
+
   def get(user: String) = {
     Map(
       "user" -> es.get(Seq("usr", user, "user")),

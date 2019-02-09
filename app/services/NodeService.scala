@@ -17,7 +17,7 @@ class NodeService @Inject()(fs: FileService) {
   }
 
 
-  def del(options: Seq[String]) = {
+  def del(options: String) = {
     fs.del(options);
   }
 

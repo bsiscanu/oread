@@ -28,15 +28,15 @@ class FileService @Inject()(implicit ec: ExecutionContext) {
 
 
   def get(pathway: Seq[String]) = {
-
     storage.get(trail(pathway))
       .getContent()
   }
 
 
-  def del(pathway: Seq[String]) = {
-
-    storage.delete(trail(pathway));
+  def del(pathway: String) = {
+    storage.delete(
+      BlobId.of(bucket, pathway)
+    );
   }
 
   def list(bucket: String, pathway: String): Iterable[String] = {

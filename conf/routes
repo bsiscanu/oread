@@ -6,6 +6,7 @@
 
 # you could get the name (or components) and explode it in the controller
 
+POST    /usr/news                                          controllers.UserController.subscribe()
 POST    /usr/login                                         controllers.UserController.login()
 POST    /usr/signup                                        controllers.UserController.signup()
 
@@ -14,4 +15,4 @@ GET     /etc/:catalog/:component/:version                  controllers.MetaContr
 
 GET     /lib/:catalog/:component/:version/*path            controllers.DomyController.read(catalog: String, component: String, version: String, path: String)
 PUT     /lib/:catalog/:component/:version/*path            controllers.DomyController.update(catalog: String, component: String, version: String, path: String)
-DELETE  /lib/:catalog/:component/:version/*path            controllers.DomyController.remove(catalog: String, component: String, version: String, path: String)
+DELETE  /lib/*path                                         controllers.DomyController.remove(path: String)

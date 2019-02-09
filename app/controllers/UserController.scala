@@ -3,6 +3,7 @@ package controllers
 import javax.inject._
 import play.api.mvc._
 import services.{ AuthService, UserService }
+
 import scala.concurrent.{ ExecutionContext, Future }
 
 
@@ -54,6 +55,16 @@ class UserController @Inject()(cc: ControllerComponents, us: UserService, as: Au
       us.set(user, pass, mail);
       Ok(as.sign(user));
     }
+  }
+
+  def subscribe = Action { request: Request[AnyContent] =>
+
+    val data = request.body.asMultipartFormData.get;
+    val content = data.dataParts("email").seq.head;
+
+    us.sub(content);
+
+    Ok("done")
   }
 }
 
