@@ -11,7 +11,7 @@ import com.google.cloud.storage.Storage.BlobListOption
 class FileService @Inject()(implicit ec: ExecutionContext) {
 
   val storage: Storage = StorageOptions.getDefaultInstance.getService;
-  val bucket = "domy_test"
+  val bucket = "domy"
 //  val bucket: String = "dpkg"; // four source files
 //  val output: String = "dbin"; // for compiled files
 

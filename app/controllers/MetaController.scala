@@ -16,13 +16,13 @@ class MetaController @Inject()(cc: ControllerComponents, ms: MetaService, as: Au
 
   def source(catalog: String, component: String, version: String) = Action {
     Ok(Json.toJson(
-      ms.list("domy_test", Seq(catalog, component, version))
+      ms.list("domy", Seq(catalog, component, version))
     )) // dpkg
   }
 
   def output(catalog: String, component: String, version: String) = Action {
     Ok(Json.toJson(
-      ms.list("dbin", Seq(catalog, component, version))
+      ms.list("domy", Seq(catalog, component, version))
     ))
   }
 }
