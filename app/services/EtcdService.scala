@@ -9,7 +9,7 @@ import com.coreos.jetcd.Client
 @Singleton
 class EtcdService @Inject()(implicit ec: ExecutionContext)  {
 
-  // transfer it to config files
+  // transfer it to config file
   val etcd = "http://localhost:2379";
 
   val client = Client.builder
@@ -39,6 +39,3 @@ class EtcdService @Inject()(implicit ec: ExecutionContext)  {
     ByteSequence.fromString(pathway.reduce(_ + "/" + _));
   }
 }
-
-// more examples:
-//https://groups.google.com/forum/#!topic/etcd-dev/Y2EJ-rzdTkk

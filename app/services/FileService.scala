@@ -12,8 +12,6 @@ class FileService @Inject()(implicit ec: ExecutionContext) {
 
   val storage: Storage = StorageOptions.getDefaultInstance.getService;
   val bucket = "domy"
-//  val bucket: String = "dpkg"; // four source files
-//  val output: String = "dbin"; // for compiled files
 
 
   def set(pathway: Seq[String], content: Array[Byte]) = {
