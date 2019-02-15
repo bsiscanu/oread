@@ -10,7 +10,8 @@ import io.jsonwebtoken.SignatureAlgorithm
 class AuthService {
 
   // move it to the config file
-  val secret: String = "*B72bc@xi3&8d!"
+  // for example purpose:
+  val secret: String = "Example"
 
   def sign(user: String): String = {
     Jwts.builder
